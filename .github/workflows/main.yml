@@ -1,0 +1,58 @@
+# NutriBudget CI/CD pipeline
+# Compiles static musl binaries for three architectures on every push to main.
+# The reference workflow used for cross-compilation setup is:
+# https://github.com/24W-GBAC/commr/blob/main/.github/workflows/main.yml
+
+name: Build and release binaries
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          # Required target
+          - target: aarch64-unknown-linux-musl
+            binary_name: nutribudget-aarch64
+
+          # Bonus target: standard 64-bit Linux
+          - target: x86_64-unknown-linux-musl
+            binary_name: nutribudget-x86_64
+
+          # Bonus target: 32-bit ARM for older Raspberry Pi and similar
+          - target: armv7-unknown-linux-musleabihf
+            binary_name: nutribudget-armv7
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross-compilation tool
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build release binary with cross
+        run: cross build --release --target ${{ matrix.target }}
+
+      - name: Rename binary for artifact upload
+        run: |
+          cp target/${{ matrix.target }}/release/nutribudget \
+             ${{ matrix.binary_name }}
+
+      - name: Upload binary as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.binary_name }}
+          path: ${{ matrix.binary_name }}
+          retention-days: 30

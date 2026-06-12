@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriBudget — Meal Planning for Students Who Know Better</title>
+  <style>
+    :root {
+      --green: #2d6a4f;
+      --light-green: #40916c;
+      --pale: #d8f3dc;
+      --bg: #f8f9fa;
+      --text: #212529;
+      --muted: #6c757d;
+      --border: #dee2e6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2d6a4f 0%, #40916c 55%, #74c69d 100%);
+      color: white;
+      padding: 3rem 1rem 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    header p.tagline {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+    }
+
+    section { margin-bottom: 3rem; }
+
+    h2 {
+      font-size: 1.5rem;
+      color: var(--green);
+      border-bottom: 2px solid var(--pale);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    p { margin-bottom: 0.9rem; }
+
+    .callout {
+      background: var(--pale);
+      border-left: 4px solid var(--light-green);
+      padding: 1rem 1.25rem;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .callout p { margin-bottom: 0; }
+
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1.25rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    code {
+      font-family: "Cascadia Code", "Fira Code", "Courier New", monospace;
+    }
+
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .download-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .download-card h3 { font-size: 1rem; margin-bottom: 0.3rem; }
+    .download-card p  { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.8rem; }
+
+    .btn {
+      display: inline-block;
+      background: var(--green);
+      color: white;
+      padding: 0.5rem 1.1rem;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+
+    .btn:hover { background: var(--light-green); }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 520px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
+    .pricing-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .pricing-card.highlighted {
+      border-color: var(--light-green);
+      border-width: 2px;
+    }
+
+    .pricing-card .price {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--green);
+      margin: 0.5rem 0;
+    }
+
+    .pricing-card ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 0.75rem;
+    }
+
+    .pricing-card ul li {
+      padding: 0.3rem 0;
+      font-size: 0.95rem;
+    }
+
+    .pricing-card ul li::before {
+      content: "✓  ";
+      color: var(--light-green);
+      font-weight: bold;
+    }
+
+    .meal-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .meal-card {
+      border-radius: 10px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      transition: transform 0.15s;
+    }
+
+    .meal-card:hover { transform: translateY(-4px); }
+
+    .meal-card .emoji { font-size: 2.6rem; display: block; margin-bottom: 0.5rem; }
+    .meal-card h3 { font-size: 0.95rem; margin-bottom: 0.25rem; }
+    .meal-card p  { font-size: 0.8rem; opacity: 0.92; margin-bottom: 0; }
+
+    .mc-orange { background: linear-gradient(135deg, #f77f00, #fcbf49); }
+    .mc-red    { background: linear-gradient(135deg, #d62828, #f77f00); }
+    .mc-green  { background: linear-gradient(135deg, #2d6a4f, #74c69d); }
+    .mc-purple { background: linear-gradient(135deg, #5a189a, #9d4edd); }
+    .mc-blue   { background: linear-gradient(135deg, #1d3557, #457b9d); }
+    .mc-teal   { background: linear-gradient(135deg, #006d77, #83c5be); }
+
+    .macro-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+
+    .macro-pill {
+      border-radius: 8px;
+      padding: 0.9rem;
+      text-align: center;
+      background: white;
+      border: 1px solid var(--border);
+    }
+
+    .macro-pill .value { font-size: 1.4rem; font-weight: 700; }
+    .macro-pill .label { font-size: 0.8rem; color: var(--muted); }
+    .macro-pill.kcal .value    { color: #d62828; }
+    .macro-pill.protein .value { color: #2d6a4f; }
+    .macro-pill.carbs .value   { color: #f77f00; }
+    .macro-pill.fat .value     { color: #5a189a; }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 2rem 1rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>NutriBudget</h1>
+  <p class="tagline">
+    You know the WHO dietary guidelines.<br>
+    You had instant noodles for dinner last night anyway.
+  </p>
+</header>
+
+<main>
+
+  <!-- Customer story -->
+  <section>
+    <h2>Sound familiar?</h2>
+
+    <p>
+      Sarah is a first-year Health Informatics student. On a typical Wednesday she has
+      lectures until 4pm, a part-time shift until 8pm, and an assignment due Thursday
+      morning.
+    </p>
+    <p>
+      She has €35 for the week and a shared dorm kitchen she can use between 9 and 11pm
+      if nobody else has claimed it.
+    </p>
+    <p>
+      She knows what a balanced diet looks like. She is literally studying it. But knowing
+      that she needs 50g of protein and knowing what to buy at Lidl for €35 that actually
+      delivers that — while reusing ingredients across the week so nothing goes to waste —
+      are two completely different problems.
+    </p>
+
+    <div class="callout">
+      <p>
+        She eats whatever is fast. Not because she does not care.
+        Because the planning itself costs time she does not have.
+      </p>
+    </div>
+
+    <p>
+      NutriBudget solves exactly that gap. Not nutrition education — she has that.
+      Nutritional <em>execution</em> under real constraints.
+    </p>
+    <p>
+      Your budget, your equipment, your leftovers. A full week planned in seconds.
+    </p>
+  </section>
+
+  <!-- Marketing statements -->
+  <section>
+    <h2>Are you this person?</h2>
+    <div class="callout">
+      <p>
+        Do you know exactly what a balanced macronutrient ratio looks like — but have
+        no idea what to buy at Lidl for €35 this week?
+      </p>
+    </div>
+    <p>
+      You do not have time to plan. Lectures, shifts, assignments, repeat.
+      We have you covered.
+    </p>
+    <p>
+      NutriBudget is not a nutrition lesson. You already have those. It is a decision
+      support tool that takes your real constraints — your budget, your equipment, your
+      leftovers — and turns them into a full week of meals in seconds.
+    </p>
+    <p>
+      <strong>One command. No subscriptions. No recipe blogs written for people with
+      fresh thyme and a stand mixer. Just a plan that fits your life.</strong>
+    </p>
+  </section>
+
+  <!-- Meal gallery -->
+  <section>
+    <h2>What's actually on the menu?</h2>
+    <p>
+      Real food a student would actually cook. Every meal in the planner comes with its
+      prep time, Lidl/Aldi cost, and full macros.
+    </p>
+
+    <div class="meal-gallery">
+      <div class="meal-card mc-orange">
+        <span class="emoji">🍝</span>
+        <h3>Pasta with tomato sauce</h3>
+        <p>20 min &middot; €0.48</p>
+      </div>
+      <div class="meal-card mc-green">
+        <span class="emoji">🥣</span>
+        <h3>Oatmeal with banana</h3>
+        <p>5 min &middot; €0.33</p>
+      </div>
+      <div class="meal-card mc-red">
+        <span class="emoji">🌮</span>
+        <h3>Black bean tacos</h3>
+        <p>20 min &middot; €1.20</p>
+      </div>
+      <div class="meal-card mc-blue">
+        <span class="emoji">🍳</span>
+        <h3>Egg fried rice with veg</h3>
+        <p>20 min &middot; €1.05</p>
+      </div>
+      <div class="meal-card mc-purple">
+        <span class="emoji">🍛</span>
+        <h3>Red lentil dahl</h3>
+        <p>30 min &middot; €0.90</p>
+      </div>
+      <div class="meal-card mc-teal">
+        <span class="emoji">🥔</span>
+        <h3>Microwave potato &amp; beans</h3>
+        <p>15 min &middot; €0.63</p>
+      </div>
+    </div>
+
+    <p style="margin-top:1.5rem;">A typical day on a €35 vegetarian plan delivers:</p>
+    <div class="macro-strip">
+      <div class="macro-pill kcal">
+        <div class="value">1,940</div>
+        <div class="label">kcal / day</div>
+      </div>
+      <div class="macro-pill protein">
+        <div class="value">62g</div>
+        <div class="label">protein</div>
+      </div>
+      <div class="macro-pill carbs">
+        <div class="value">248g</div>
+        <div class="label">carbs</div>
+      </div>
+      <div class="macro-pill fat">
+        <div class="value">54g</div>
+        <div class="label">fat</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation -->
+  <section>
+    <h2>Installation</h2>
+
+    <p>Download the binary for your system below, then make it executable:</p>
+
+    <pre><code>chmod +x nutribudget-x86_64
+./nutribudget-x86_64 --budget 35 --diet vegetarian --equipment shared-dorm-kitchen --time 20</code></pre>
+
+    <p>Or build from source if you have Rust installed:</p>
+
+    <pre><code>git clone https://github.com/NamazziJosephine/nutribudget
+cd nutribudget
+cargo build --release
+./target/release/nutribudget --budget 35 --diet vegetarian --equipment shared-dorm-kitchen --time 20</code></pre>
+  </section>
+
+  <!-- Download links -->
+  <section>
+    <h2>Download</h2>
+    <p>Static binaries — no dependencies, no install, just run.</p>
+
+    <div class="download-grid">
+      <div class="download-card">
+        <h3>Linux 64-bit</h3>
+        <p>Most laptops and desktops</p>
+        <a class="btn" href="../../releases/latest/download/nutribudget-x86_64">
+          Download
+        </a>
+      </div>
+      <div class="download-card">
+        <h3>ARM 64-bit</h3>
+        <p>Newer Raspberry Pi, ARM servers</p>
+        <a class="btn" href="../../releases/latest/download/nutribudget-aarch64">
+          Download
+        </a>
+      </div>
+      <div class="download-card">
+        <h3>ARM 32-bit</h3>
+        <p>Older Raspberry Pi and ARM devices</p>
+        <a class="btn" href="../../releases/latest/download/nutribudget-armv7">
+          Download
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section>
+    <h2>Pricing</h2>
+    <p>
+      Yes, the irony of charging for a student budget tool is not lost on us.
+      That is why the free tier is genuinely useful.
+    </p>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Free</h3>
+        <div class="price">€0</div>
+        <p>Forever</p>
+        <ul>
+          <li>3 meal plans per week</li>
+          <li>All dietary restrictions</li>
+          <li>All equipment levels</li>
+          <li>Shopping list</li>
+          <li>Nutrition summary</li>
+        </ul>
+      </div>
+      <div class="pricing-card highlighted">
+        <h3>Pro</h3>
+        <div class="price">€4 <span style="font-size:1rem;font-weight:400;">/month</span></div>
+        <p>Unlimited planning</p>
+        <ul>
+          <li>Unlimited meal plans</li>
+          <li>All features from Free</li>
+          <li>Priority support</li>
+          <li>Early access to new meals</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Source -->
+  <section>
+    <h2>Source code</h2>
+    <p>
+      NutriBudget is open source and built in Rust.
+      <a href="https://github.com/NamazziJosephine/nutribudget">View on GitHub</a>
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <p>NutriBudget &mdash; built for all university students, by Namazzi Josephine.</p>
+  <p>Prices based on Lidl/Aldi Germany 2024. MIT License.</p>
+</footer>
+
+</body>
+</html>

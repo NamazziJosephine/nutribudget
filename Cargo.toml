@@ -1,0 +1,21 @@
+[package]
+name = "nutribudget"
+version = "0.1.0"
+edition = "2021"
+description = "Weekly meal planner for students who know the WHO guidelines and still ate instant noodles last night"
+license = "MIT"
+
+[[bin]]
+name = "nutribudget"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "=4.4.11", features = ["derive"] }
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.115"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
