@@ -1,6 +1,7 @@
 # NutriBudget CI/CD pipeline
-# Compiles static musl binaries for three architectures on every push to main.
-# The reference workflow used for cross-compilation setup is:
+# Compiles static musl binaries for three architectures on every push to main,
+# then publishes them as a public GitHub Release so anyone can download them.
+# Reference workflow for cross-compilation setup:
 # https://github.com/24W-GBAC/commr/blob/main/.github/workflows/main.yml
 
 name: Build and release binaries
@@ -9,6 +10,9 @@ on:
   push:
     branches:
       - main
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -56,3 +60,26 @@ jobs:
           name: ${{ matrix.binary_name }}
           path: ${{ matrix.binary_name }}
           retention-days: 30
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all built binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: binaries
+          merge-multiple: true
+
+      - name: Publish binaries to the latest release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest build
+          body: >
+            Automatically built static binaries from the most recent push
+            to main. Download the file matching your system, then run
+            chmod +x on it and execute it from the terminal.
+          files: binaries/*
